@@ -1,0 +1,6 @@
+https://www.youtube.com/watch?v=de-204MM0tU&list=PLs4co9a6NhMw7xB4xPSkSQRM8uQVAZak6
+05-12
+
+npm i express mongoose dotenv cors morgan cookie-parser
+
+npm i -D typescript ts-node-dev @types/node
