@@ -1,5 +1,5 @@
-import { timeStamp } from "console";
 import mongoose from "mongoose";
+import { IUser } from "../config/interface";
 
 const userSchema = new mongoose.Schema(
   {
@@ -31,10 +31,10 @@ const userSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      default: "normal", //fast ?? 이게 뭐여
+      default: "register", //login
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model<IUser>("User", userSchema);

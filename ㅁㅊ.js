@@ -2,12 +2,18 @@ import { Request, Response } from "express";
 import Users from "../models/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateActiveToken } from "../config/generateToken";
+import {
+  generateAccessToken,
+  generateActiveToken,
+  generateRefreshToken,
+} from "../config/generateToken";
 
 import { sendSms } from "../config/sendSMS";
 import sendEmail from "../config/sendMail";
 
 import { validateEmail, validPhone } from "../middleware/valid";
+import { INewUser } from "../config/interface";
+import { IDecodedIToken, IUser } from "../config/interface";
 
 const CLIENT_URL = `${process.env.BASE_URL}`;
 
@@ -47,17 +53,69 @@ const authCtrl = {
   activeAccount: async (req: Request, res: Response) => {
     try {
       const { active_token } = req.body;
-
-      const decoded = jwt.verify(
-        active_token,
-        `${process.env.ACTIVE_TOKEN_SECRET}`
+      //<IToken> 이건 뭐지??
+      const decoded = <IDecodedIToken>(
+        jwt.verify(active_token, `${process.env.ACTIVE_TOKEN_SECRET}`)
       );
+      //IToken에 newUser:INewUser가 있는거 알지?
+      const { newUser } = decoded;
+
+      if (!newUser)
+        return res.status(400).json({ msg: "Invalid authentication." });
 
       console.log(decoded);
-    } catch (err) {
-      return res.status(500).json({ msg: err });
+      const user = new Users(newUser);
+      // 이렇게 mongodb에 저장시키는 건가?
+      await user.save();
+      res.json({ msg: "Account has been activated" });
+    } catch (err: any) {
+      // 아니 굳이 메일보낼때만 유효성검사를 하면 되는 것을 왜 또 활성화단계?에서도 하려는 거지?
+      let errMsg;
+      if (err.code === 11000) {
+        errMsg = Object.keys(err.keyValue)[0] + " Already exists.";
+      } else {
+        // 이 부분은 잘 모르겠다.
+        let name = Object.keys(err.errors)[0];
+        errMsg = err.errors[`${name}`].message;
+      }
+      return res.status(500).json({ msg: errMsg });
+    }
+  },
+  login: async (req: Request, res: Response) => {
+    try {
+      const { account, password } = req.body;
+
+      const user = await Users.findOne({ account });
+      if (!user)
+        return res.status(400).json({ msg: "This account does not exits." });
+
+      // if user exists
+      loginUser(user, password, res);
+    } catch (err: any) {
+      return res.status(500).json({ msg: err.message });
     }
   },
 };
 
+//이걸 왜 밖으로 뺐을까?
+const loginUser = async (user: IUser, password: string, res: Response) => {
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ msg: "Password is incorrect." });
+
+  const access_token = generateAccessToken({ id: user._id });
+  const refresh_token = generateRefreshToken({ id: user._id });
+
+  res.cookie("refreshtoken", refresh_token, {
+    httpOnly: true,
+    path: `/api/refresh_token`,
+    maxAge: 30 * 24 * 60 * 1000, // 30dasy
+  });
+
+  res.json({
+    msg: "Login Success!",
+    access_token,
+    //_doc은 interface에서 IUser에 추가해줬더니 에러가 사라짐
+    user: { ...user._doc, password: "" },
+  });
+};
 export default authCtrl;

@@ -1,4 +1,3 @@
-// generate =>만들어내다, 발생시키다.. implement=> 시행하다..
 import jwt from "jsonwebtoken";
 
 export const generateActiveToken = (payload: object) => {
