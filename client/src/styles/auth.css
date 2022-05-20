@@ -1,0 +1,29 @@
+.auth_page {
+  width: 100%;
+  padding: 2.5rem 0;
+  background: #fdfdfd;
+  display: flex;
+  justify-content: center;
+}
+
+.auth_page .auth_box {
+  background: #fff;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 2.7rem 1.7rem;
+}
+
+.auth_page .pass {
+  position: relative;
+}
+
+.auth_page .pass small {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  /* 이거하면 중앙에 딱 맞게 정렬됨, top 50%와 함께 해야함 */
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 0.5;
+}
