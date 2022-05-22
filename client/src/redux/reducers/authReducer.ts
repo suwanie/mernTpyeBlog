@@ -8,5 +8,4 @@ const authReducer = (state: IAuth = {}, action: IAuthType): IAuth => {
       return state;
   }
 };
-
 export default authReducer;

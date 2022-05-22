@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { InputChange } from "../../utils/TypeScript";
+import { Dispatch, useState } from "react";
+import { useDispatch } from "react-redux";
+import { InputChange, FormSubmit } from "../../utils/TypeScript";
+import { login } from "../../redux/action/authAction";
 
 function LoginPass() {
   // account와 password를 개별 state로 관리하지 않는구나?
@@ -10,14 +12,20 @@ function LoginPass() {
 
   const [typePass, setTypePass] = useState(false);
 
-  // 구조분해를 엄청 하네?
+  const dispatch = useDispatch();
+
   const handleChangeInput = (e: InputChange) => {
     const { value, name } = e.target;
     setUserLogin({ ...userLogin, [name]: value });
   };
 
+  const handleSubmit = (e: FormSubmit) => {
+    e.preventDefault();
+    dispatch(login(userLogin));
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="form-group mb-3">
         {/* htmlFor땜시 저 부분을 누르면 자동으로 input창으로 넘어가게 된다. */}
         <label htmlFor="account" className="form-label">
