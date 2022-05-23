@@ -1,4 +1,4 @@
-import { Dispatch, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { InputChange, FormSubmit } from "../../utils/TypeScript";
 import { login } from "../../redux/action/authAction";
