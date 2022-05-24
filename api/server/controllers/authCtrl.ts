@@ -12,8 +12,7 @@ import { sendSms } from "../config/sendSMS";
 import sendEmail from "../config/sendMail";
 
 import { validateEmail, validPhone } from "../middleware/valid";
-import { INewUser, IUser } from "../config/interface";
-import { IDecodedIToken } from "../config/interface";
+import { IDecodedToken, IUser } from "../config/interface";
 
 const CLIENT_URL = `${process.env.BASE_URL}`;
 
@@ -45,7 +44,7 @@ const authCtrl = {
         sendSms(account, url, "Verify your phone number");
         return res.json({ msg: "Success! Please check your phone number." });
       }
-    } catch (err) {
+    } catch (err: any) {
       return res.status(500).json(err);
     }
   },
@@ -55,7 +54,7 @@ const authCtrl = {
     try {
       const { active_token } = req.body;
       //<IToken> 이건 뭐지??
-      const decoded = <IDecodedIToken>(
+      const decoded = <IDecodedToken>(
         jwt.verify(active_token, `${process.env.ACTIVE_TOKEN_SECRET}`)
       );
       //IToken에 newUser:INewUser가 있는거 알지?
@@ -63,23 +62,16 @@ const authCtrl = {
 
       if (!newUser)
         return res.status(400).json({ msg: "Invalid authentication." });
-
-      console.log(decoded);
-      const user = new Users(newUser);
-      // 이렇게 mongodb에 저장시키는 건가?
-      await user.save();
+      const user = await Users.findOne({ account: newUser.account });
+      if (user)
+        return res
+          .status(400)
+          .json({ msg: "This account alreay exists - authCtrl 68" });
+      const new_user = new Users(newUser);
+      await new_user.save();
       res.json({ msg: "Account has been activated" });
     } catch (err: any) {
-      // 아니 굳이 메일보낼때만 유효성검사를 하면 되는 것을 왜 또 활성화단계?에서도 하려는 거지?
-      let errMsg;
-      if (err.code === 11000) {
-        errMsg = Object.keys(err.keyValue)[0] + " Already exists.";
-      } else {
-        // 이 부분은 잘 모르겠다.
-        let name = Object.keys(err.errors)[0];
-        errMsg = err.errors[`${name}`].message;
-      }
-      return res.status(500).json({ msg: errMsg });
+      return res.status(500).json({ msg: err.message });
     }
   },
 
@@ -111,7 +103,7 @@ const authCtrl = {
       if (!rf_token) return res.status(400).json({ msg: "Please Login Now" });
       //decoded =>해독하다, (컴퓨터가)해독하다, (외국어를 읽고 들어)이해하다(encode).
       //encode =>암호로 바꾸다, 부호화하다, (외국어로)표현하다(말하다, 글을 쓰다.)
-      const decoded = <IDecodedIToken>(
+      const decoded = <IDecodedToken>(
         jwt.verify(rf_token, `${process.env.REFRESH_TOKEN_SECRET}`)
       );
 

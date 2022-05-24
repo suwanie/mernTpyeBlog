@@ -4,7 +4,7 @@ import { RootReducer } from "../../utils/TypeScript";
 import Toast from "./Toast";
 import Loading from "./Loading";
 
-function Alert() {
+export function Alert() {
   const { alert } = useSelector((state: RootReducer) => state);
 
   return (
@@ -21,4 +21,10 @@ function Alert() {
   );
 }
 
-export default Alert;
+export const showErrMsg = (msg: string) => {
+  return <div className="errMsg">{msg}</div>;
+};
+
+export const showSuccessMsg = (msg: string) => {
+  return <div className="successMsg">{msg}</div>;
+};

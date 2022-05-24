@@ -17,7 +17,7 @@ export interface INewUser {
   password: string;
 }
 
-export interface IDecodedIToken {
+export interface IDecodedToken {
   id?: string;
   newUser?: INewUser;
   iat: number;
