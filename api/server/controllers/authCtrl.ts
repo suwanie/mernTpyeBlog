@@ -24,7 +24,7 @@ const authCtrl = {
       const { name, account, password } = req.body;
       const user = await Users.findOne({ account });
       if (user) {
-        return res.status(400).json({ msg: "이미 존재하는디 ? " });
+        return res.status(400).json({ msg: "이미 메일 존재하는디 ? " });
       }
 
       const passwordHash = await bcrypt.hash(password, 12);

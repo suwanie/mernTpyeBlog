@@ -1,31 +1,48 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { InputChange, FormSubmit } from "../../utils/TypeScript";
-import { login } from "../../redux/action/authAction";
+import { register } from "../../redux/action/authAction";
 import { useAppDispatch } from "../../redux/hook";
-function LoginPass() {
-  // account와 password를 개별 state로 관리하지 않는구나?
-  const initialState = { account: "", password: "" };
-  const [userLogin, setUserLogin] = useState(initialState);
+function RegisterForm() {
+  const initialState = { name: "", account: "", password: "", cf_password: "" };
+  const [userRegister, setUserRegister] = useState(initialState);
 
-  const { account, password } = userLogin;
+  const { name, account, password, cf_password } = userRegister;
 
   const [typePass, setTypePass] = useState(false);
+  const [typeCfPass, setTypeCfPass] = useState(false);
 
   const dispatch = useAppDispatch();
 
   const handleChangeInput = (e: InputChange) => {
     const { value, name } = e.target;
-    setUserLogin({ ...userLogin, [name]: value });
+    setUserRegister({ ...userRegister, [name]: value });
   };
 
   const handleSubmit = (e: FormSubmit) => {
     e.preventDefault();
-    dispatch(login(userLogin));
+    dispatch(register(userRegister));
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      <div className="form-group mb-3">
+        {/* htmlFor땜시 저 부분을 누르면 자동으로 input창으로 넘어가게 된다. */}
+        <label htmlFor="account" className="form-label">
+          {" "}
+          Name{" "}
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          id="name"
+          name="name"
+          value={name}
+          onChange={handleChangeInput}
+          placeholder="Your name is up to 20 chars."
+        />
+      </div>
+
       <div className="form-group mb-3">
         {/* htmlFor땜시 저 부분을 누르면 자동으로 input창으로 넘어가게 된다. */}
         <label htmlFor="account" className="form-label">
@@ -38,6 +55,7 @@ function LoginPass() {
           name="account"
           value={account}
           onChange={handleChangeInput}
+          placeholder="Example@naver.com/+821071962013"
         />
       </div>
 
@@ -55,6 +73,7 @@ function LoginPass() {
             name="password"
             value={password}
             onChange={handleChangeInput}
+            placeholder="Password must be at least 6chars."
           />
 
           {/* 클릭했을 때 참 거짓을 계속 바꿔준다. */}
@@ -65,15 +84,33 @@ function LoginPass() {
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="btn btn-dark w-100 mt-4"
-        disabled={account && password ? false : true}
-      >
-        Login
+      <div className="form-group mb-3">
+        <label htmlFor="password" className="form-label">
+          ConfirmPassword
+        </label>
+
+        <div className="pass">
+          <input
+            type={typeCfPass ? "text" : "password"}
+            className="form-control"
+            id="cf_password"
+            name="cf_password"
+            value={cf_password}
+            onChange={handleChangeInput}
+            placeholder="Your confirm password."
+          />
+
+          <small onClick={() => setTypeCfPass(!typeCfPass)}>
+            {typeCfPass ? "Hide" : "Show"}
+          </small>
+        </div>
+      </div>
+
+      <button type="submit" className="btn btn-dark w-100 my-2">
+        Register
       </button>
     </form>
   );
 }
 
-export default LoginPass;
+export default RegisterForm;

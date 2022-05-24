@@ -16,6 +16,12 @@ export interface IUserLogin {
   password: string;
 }
 
+// 오호.. 이렇게 상속시키면 account와 password를 따로 안적어줘도 되는구나?
+export interface IUserRegister extends IUserLogin {
+  name: string;
+  cf_password: string;
+}
+
 export interface IUser extends IUserLogin {
   avatar: string;
   createdAt: string;

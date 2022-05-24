@@ -26,10 +26,10 @@ function Login() {
         </small>
 
         <p>
-          You don't have an accout? &nbsp;
+          {`  You don't have an accout?`} &nbsp;
           <Link to={`/register`} style={{ color: "crimson" }}>
             {/* 걍 글만써도 되는데 왜 이렇게 하지? */}
-            {`Register Now`}
+            Register Now
           </Link>
         </p>
       </div>
